@@ -10,10 +10,10 @@ import (
 
 func TestRound(t *testing.T) {
 	testCases := []struct {
-		val	float64
-		roundOn	float64
-		places	int
-		success	bool
+		val      float64
+		roundOn  float64
+		places   int
+		success  bool
 		expected float64
 	}{
 		{3.556, .5, 2, true, 3.56},
@@ -31,10 +31,10 @@ func TestSolve(t *testing.T) {
 	// classical case for polynomial regression
 	// see: https://rosettacode.org/wiki/Polynomial_regression#Library_gonum.2Fmatrix
 	var (
-		x = []float64{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
-		y = []float64{1, 6, 17, 34, 57, 86, 121, 162, 209, 262, 321}
+		x        = []float64{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+		y        = []float64{1, 6, 17, 34, 57, 86, 121, 162, 209, 262, 321}
 		expected = []float64{1, 2, 3}
-		degree = 2
+		degree   = 2
 	)
 
 	c := Solve(x, y, degree)
@@ -43,5 +43,6 @@ func TestSolve(t *testing.T) {
 		t.Errorf("expected \n%v\n got \n%v\n", mat64.Formatted(e), mat64.Formatted(c))
 	}
 }
+
 //func TestVandermonde(t *testing.T) {}
 //func TestPredict(t *testing.T) {}

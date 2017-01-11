@@ -2,16 +2,15 @@
 package regression
 
 import (
-        "fmt"
+	"fmt"
 	"math"
 
-        "github.com/gonum/matrix/mat64"
+	"github.com/gonum/matrix/mat64"
 )
 
 const (
 	debug = false
 )
-
 
 func Round(val float64, roundOn float64, places int) (newVal float64) {
 	var round float64

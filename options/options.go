@@ -2,32 +2,31 @@
 package options
 
 import (
-        "fmt"
+	"fmt"
 
-        "github.com/golang/glog"
-        "github.com/spf13/pflag"
+	"github.com/golang/glog"
+	"github.com/spf13/pflag"
 )
 
-
 type AutoScalerConfig struct {
-	Debug	bool
-	PrometheusIPPort	string
-	QueryExpression	string
-	PollPeriod	string
-	Step	string
-	DegPolynomial	int
-	PrintVer	bool
+	Debug            bool
+	PrometheusIPPort string
+	QueryExpression  string
+	PollPeriod       string
+	Step             string
+	DegPolynomial    int
+	PrintVer         bool
 }
 
 func NewAutoScalerConfig() *AutoScalerConfig {
-	return &AutoScalerConfig {
-		Debug:	false,
-		PrometheusIPPort:	"192.168.99.100:30902",
-		QueryExpression:	"avg(container_spec_cpu$_period{namespace=\"b2b-dev-hk\",pod_name=~\"b2b-web-.*\"})",
-		PollPeriod:	"60s",
-		Step:	"15s",
-		DegPolynomial: 2,
-		PrintVer:	true,
+	return &AutoScalerConfig{
+		Debug:            false,
+		PrometheusIPPort: "192.168.99.100:31366",
+		QueryExpression:  "avg(container_spec_cpu_period{namespace=\"b2b-dev-hk\",pod_name=~\"b2b-web-.*\"})",
+		PollPeriod:       "60s",
+		Step:             "15s",
+		DegPolynomial:    2,
+		PrintVer:         false,
 	}
 }
 
@@ -48,7 +47,7 @@ func (c *AutoScalerConfig) ValidateFlags() error {
 }
 
 func (c *AutoScalerConfig) AddFlags(fs *pflag.FlagSet) {
-	fs.BoolVar(&c.Debug, "debug", c.Debug,  "Enable debug.")
+	fs.BoolVar(&c.Debug, "debug", c.Debug, "Enable debug.")
 	fs.StringVar(&c.PrometheusIPPort, "prom-ip-port", c.PrometheusIPPort, "Prometheus ip/dns name and listen port number.")
 	fs.StringVar(&c.QueryExpression, "query-exp", c.QueryExpression, "Expression used to query Prometheus for scaling.")
 	fs.StringVar(&c.PollPeriod, "poll-period", c.PollPeriod, "The time to check Prometheus for metrics and perform autoscale.")
