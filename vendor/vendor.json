@@ -1,0 +1,22 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "hUBW8exaJxVZxamnYWZkajUOEfY=",
+			"path": "github.com/zanhsieh/custom-k8s-hpa",
+			"revision": ""
+		},
+		{
+			"checksumSHA1": "mUOFAks4sozpL3kw0KHlNiC/OjI=",
+			"path": "github.com/zanhsieh/custom-k8s-hpa/options",
+			"revision": ""
+		},
+		{
+			"checksumSHA1": "d4MnOyZovX3xoF+G6hh4pIJ9BXY=",
+			"path": "github.com/zanhsieh/custom-k8s-hpa/regression",
+			"revision": ""
+		}
+	],
+	"rootPath": "github.com/zanhsieh/custom-k8s-hpa"
+}

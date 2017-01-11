@@ -1,0 +1,69 @@
+//usr/bin/env go run $0 "$@"; exit
+package regression
+
+import (
+    "fmt"
+
+    "github.com/gonum/matrix/mat64"
+)
+
+const(
+    debug = false
+)
+
+var (
+    x = []float64{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+    y = []float64{1, 6, 17, 34, 57, 86, 121, 162, 209, 262, 321}
+    //y = []float64{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+    degree = 2
+)
+
+func main() {
+    a := Vandermonde(x, degree)
+    if debug {
+        fmt.Printf("a=>\n%v\n", mat64.Formatted(a))
+    }
+
+    b := mat64.NewDense(len(y), 1, y)
+    if debug {
+        fmt.Printf("b=>\n%v\n", mat64.Formatted(b))
+    }
+
+    c := mat64.NewDense(degree+1, 1, nil)
+
+    qr := new(mat64.QR)
+    qr.Factorize(a)
+
+    err := c.SolveQR(qr, false, b)
+    if err != nil {
+        fmt.Println(err)
+    } else {
+        fmt.Printf("c=>\n%.3f\n", mat64.Formatted(c))
+    }
+
+    result := Predict(11, c)
+    fmt.Printf("result=>\n%.3f\n", result)
+
+}
+
+func Vandermonde(a []float64, degree int) *mat64.Dense {
+    x := mat64.NewDense(len(a), degree+1, nil)
+    for i := range a {
+        for j, p := 0, 1.; j <= degree; j, p = j+1, p*a[i] {
+            x.Set(i, j, p)
+        }
+    }
+    return x
+}
+
+func Predict(thisP int, c *mat64.Dense) float64 {
+    p := []float64{float64(thisP)}
+    vp := Vandermonde(p, degree)
+    if debug {
+        fmt.Printf("vp=>\n%v\n", mat64.Formatted(vp))
+    }
+
+    result := mat64.NewDense(1, 1, nil)
+    result.Mul(vp, c)
+    return result.At(0, 0)
+}
