@@ -27,7 +27,7 @@ func NewAutoScalerConfig() *AutoScalerConfig {
 		PollPeriod:	"60s",
 		Step:	"15s",
 		DegPolynomial: 2,
-		PrintVer:	false,
+		PrintVer:	true,
 	}
 }
 

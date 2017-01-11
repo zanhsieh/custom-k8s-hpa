@@ -6,12 +6,15 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	//"os"
 	//"reflect"
 	"time"
 
 	"github.com/gonum/matrix/mat64"
+	"github.com/spf13/pflag"
 	"github.com/tidwall/gjson"
 	"github.com/zanhsieh/custom-k8s-hpa/regression"
+	"github.com/zanhsieh/custom-k8s-hpa/options"
 )
 
 const (
@@ -28,6 +31,9 @@ func main() {
 	//cwd, _ := os.Getwd()
 	//fmt.Println("cwd:", cwd)
 	//fmt.Println("args:", os.Args[1:])
+	config := options.NewAutoScalerConfig()
+	config.AddFlags(pflag.CommandLine)
+	fmt.Printf("%v\n", config)
 	now := time.Now()
 	minsAgo := now.Add(-5 * time.Minute)
 	tmp := fmt.Sprintf(serverPath, queryExp, int32(minsAgo.Unix()), int32(now.Unix()), step)
