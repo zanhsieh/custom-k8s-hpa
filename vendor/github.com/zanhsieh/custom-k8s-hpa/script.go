@@ -4,30 +4,39 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
+	"os"
 	//"reflect"
 	"time"
 
+	"github.com/golang/glog"
 	"github.com/gonum/matrix/mat64"
+	"github.com/spf13/pflag"
 	"github.com/tidwall/gjson"
+	"github.com/zanhsieh/custom-k8s-hpa/options"
 	"github.com/zanhsieh/custom-k8s-hpa/regression"
 )
 
-const (
-	debug      = false
-	prometheus = "192.168.99.100:30902"
-	serverPath = "/api/v1/query_range?query=%v&start=%v&end=%v&step=%v"
-	queryExp   = "avg(container_spec_cpu_period{namespace=\"b2b-dev-hk\",pod_name=~\"b2b-web-.*\"})"
-	step       = "15s"
-	degree     = 2
-)
-
 func main() {
-	//fmt.Println("Hello world!")
-	//cwd, _ := os.Getwd()
-	//fmt.Println("cwd:", cwd)
-	//fmt.Println("args:", os.Args[1:])
+	config := options.NewAutoScalerConfig()
+	config.AddFlags(pflag.CommandLine)
+	pflag.Parse()
+	if config.PrintVer {
+		fmt.Printf("%v\n", "0.0.1")
+		os.Exit(0)
+	}
+	if err := config.ValidateFlags(); err != nil {
+		glog.Errorf("%v\n", err)
+		os.Exit(1)
+	}
+	var (
+		debug      = config.Debug
+		prometheus = config.PrometheusIPPort
+		serverPath = "/api/v1/query_range?query=%v&start=%v&end=%v&step=%v"
+		queryExp   = config.QueryExpression
+		step       = config.Step
+		degree     = config.DegPolynomial
+	)
 	now := time.Now()
 	minsAgo := now.Add(-5 * time.Minute)
 	tmp := fmt.Sprintf(serverPath, queryExp, int32(minsAgo.Unix()), int32(now.Unix()), step)
@@ -37,12 +46,12 @@ func main() {
 	}
 	res, err := http.Get(url)
 	if err != nil {
-		log.Fatal(err)
+		glog.Fatal(err)
 	}
 	jsonString, err := ioutil.ReadAll(res.Body)
 	res.Body.Close()
 	if err != nil {
-		log.Fatal(err)
+		glog.Fatal(err)
 	}
 	if debug {
 		fmt.Printf("%s", jsonString)

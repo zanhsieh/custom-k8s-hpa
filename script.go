@@ -15,6 +15,7 @@ import (
 	"github.com/tidwall/gjson"
 	"github.com/zanhsieh/custom-k8s-hpa/options"
 	"github.com/zanhsieh/custom-k8s-hpa/regression"
+	"github.com/zanhsieh/custom-k8s-hpa/version"
 )
 
 func main() {
@@ -22,7 +23,7 @@ func main() {
 	config.AddFlags(pflag.CommandLine)
 	pflag.Parse()
 	if config.PrintVer {
-		fmt.Printf("%v\n", "0.0.1")
+		fmt.Printf("%v\n", version.VERSION)
 		os.Exit(0)
 	}
 	if err := config.ValidateFlags(); err != nil {
