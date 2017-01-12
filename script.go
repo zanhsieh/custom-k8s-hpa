@@ -3,18 +3,12 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
-	"net/http"
 	"os"
-	//"reflect"
-	"time"
 
 	"github.com/golang/glog"
-	"github.com/gonum/matrix/mat64"
 	"github.com/spf13/pflag"
-	"github.com/tidwall/gjson"
+	"github.com/zanhsieh/custom-k8s-hpa/autoscaler"
 	"github.com/zanhsieh/custom-k8s-hpa/options"
-	"github.com/zanhsieh/custom-k8s-hpa/regression"
 	"github.com/zanhsieh/custom-k8s-hpa/version"
 )
 
@@ -30,65 +24,13 @@ func main() {
 		glog.Errorf("%v\n", err)
 		os.Exit(1)
 	}
-	var (
-		debug      = config.Debug
-		prometheus = config.PrometheusIPPort
-		serverPath = "/api/v1/query_range?query=%v&start=%v&end=%v&step=%v"
-		queryExp   = config.QueryExpression
-		step       = config.Step
-		degree     = config.DegPolynomial
-	)
-	now := time.Now()
-	minsAgo := now.Add(-5 * time.Minute)
-	tmp := fmt.Sprintf(serverPath, queryExp, int32(minsAgo.Unix()), int32(now.Unix()), step)
-	url := fmt.Sprintf("http://%v%v", prometheus, tmp)
-	if debug {
-		fmt.Println(url)
-	}
-	res, err := http.Get(url)
-	if err != nil {
-		glog.Fatal(err)
-	}
-	jsonString, err := ioutil.ReadAll(res.Body)
-	res.Body.Close()
-	if err != nil {
-		glog.Fatal(err)
-	}
-	if debug {
-		fmt.Printf("%s", jsonString)
-	}
-
-	metric := gjson.GetManyBytes(jsonString, "data.result.0.values.#.0", "data.result.0.values.#.1")
-	if debug {
-		fmt.Printf("time=>%v\n", metric[0].Array())
-		fmt.Printf("value=>%v\n", metric[1].Array())
-	}
-	timeSeries := make([]float64, len(metric[0].Array()))
-	metricVals := make([]float64, len(metric[1].Array()))
-	firstElement := 0.0
-	for i, time := range metric[0].Array() {
-		// This avoids nth power of timestamp cause "matrix singular or near-singular with condition number xxx" problem
-		if i == 0 {
-			firstElement, timeSeries[i] = time.Float(), 0.0
-		} else {
-			timeSeries[i] = time.Float() - firstElement
-		}
-	}
-	for j, metricV := range metric[1].Array() {
-		metricVals[j] = metricV.Float()
-	}
-	if debug {
-		fmt.Printf("timeSeries=>\n%v\n", timeSeries)
-		fmt.Printf("metricVals=>\n%v\n", metricVals)
-	}
-	c := regression.Solve(timeSeries, metricVals, degree)
-	if debug {
-		fmt.Printf("c=>\n%.3f\n", mat64.Formatted(c))
-	}
-	latestTime := timeSeries[len(timeSeries)-1]
-	timeOfPredict := 2.0*latestTime - timeSeries[len(timeSeries)-2]
-	predictResult := regression.Round(regression.Predict(timeOfPredict, c, degree), .5, 2)
-	fmt.Printf("predictResult=>%v\n", predictResult)
+	scaler, err := autoscaler.NewAutoScaler(config)
+        if err != nil {
+                glog.Errorf("%v", err)
+                os.Exit(1)
+        }
+        // Begin autoscaling.
+        scaler.Run()
 }
 
 // Sample curl to prometheus

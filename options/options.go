@@ -23,7 +23,7 @@ func NewAutoScalerConfig() *AutoScalerConfig {
 		Debug:            false,
 		PrometheusIPPort: "192.168.99.100:31366",
 		QueryExpression:  "avg(container_spec_cpu_period{namespace=\"b2b-dev-hk\",pod_name=~\"b2b-web-.*\"})",
-		PollPeriod:       "60s",
+		PollPeriod:       "15s",
 		Step:             "15s",
 		DegPolynomial:    2,
 		PrintVer:         false,
