@@ -3,7 +3,7 @@ package regression
 
 import (
 	"math"
-	//"reflect"
+	"reflect"
 	"testing"
 
 	"github.com/gonum/matrix/mat64"
@@ -11,17 +11,22 @@ import (
 
 func TestRound(t *testing.T) {
 	testCases := []struct {
-		val      float64
-		roundOn  float64
-		places   int
+		input    []interface{}
 		success  bool
 		expected float64
 	}{
-		{3.556, .5, 2, true, 3.56},
+		{[]interface{}{3.556, .5, 2}, true, 3.56},
 	}
 	for i := range testCases {
 		tc := &testCases[i]
-		resultVal := Round(tc.val, tc.roundOn, tc.places)
+		arr := tc.input
+		var args []reflect.Value
+		for _, x := range arr {
+			args = append(args, reflect.ValueOf(x))
+		}
+		fun := reflect.ValueOf(Round)
+		result := fun.Call(args)
+		resultVal := result[0].Interface().(float64)
 		if resultVal != tc.expected {
 			t.Errorf("expected %q, got %q", tc.expected, resultVal)
 		}
