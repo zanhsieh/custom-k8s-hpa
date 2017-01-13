@@ -81,7 +81,7 @@ func (k *k8sClient) GetNamespace() (namespace string) {
 }
 
 func (k *k8sClient) FetchConfigMap(namespace, configmap string) (*apiv1.ConfigMap, error) {
-	cm, err := k.clientset.CoreClient.ConfigMaps(namespace).Get(configmap)
+	cm, err := k.clientset.Core().ConfigMaps(namespace).Get(configmap, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -93,7 +93,7 @@ func (k *k8sClient) CreateConfigMap(namespace, configmap string, params map[stri
 	providedConfigMap.ObjectMeta.Name = configmap
 	providedConfigMap.ObjectMeta.Namespace = namespace
 	providedConfigMap.Data = params
-	cm, err := k.clientset.CoreClient.ConfigMaps(namespace).Create(&providedConfigMap)
+	cm, err := k.clientset.Core().ConfigMaps(namespace).Create(&providedConfigMap)
 	if err != nil {
 		return nil, err
 	}
@@ -106,7 +106,7 @@ func (k *k8sClient) UpdateConfigMap(namespace, configmap string, params map[stri
 	providedConfigMap.ObjectMeta.Name = configmap
 	providedConfigMap.ObjectMeta.Namespace = namespace
 	providedConfigMap.Data = params
-	cm, err := k.clientset.CoreClient.ConfigMaps(namespace).Update(&providedConfigMap)
+	cm, err := k.clientset.Core().ConfigMaps(namespace).Update(&providedConfigMap)
 	if err != nil {
 		return nil, err
 	}
@@ -125,7 +125,7 @@ type ClusterStatus struct {
 func (k *k8sClient) GetClusterStatus() (clusterStatus *ClusterStatus, err error) {
 	opt := api.ListOptions{Watch: false}
 
-	nodes, err := k.clientset.CoreClient.Nodes().List(opt)
+	nodes, err := k.clientset.Core().Nodes().List(opt)
 	if err != nil {
 		return nil, err
 	}
