@@ -6,9 +6,9 @@ import (
 	"strings"
 
 	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/pkg/api"
 	"k8s.io/client-go/pkg/api/resource"
 	apiv1 "k8s.io/client-go/pkg/api/v1"
+	apisMetaV1 "k8s.io/client-go/pkg/apis/meta/v1"
 	"k8s.io/client-go/rest"
 
 	"github.com/golang/glog"
@@ -81,7 +81,7 @@ func (k *k8sClient) GetNamespace() (namespace string) {
 }
 
 func (k *k8sClient) FetchConfigMap(namespace, configmap string) (*apiv1.ConfigMap, error) {
-	cm, err := k.clientset.Core().ConfigMaps(namespace).Get(configmap, nil)
+	cm, err := k.clientset.Core().ConfigMaps(namespace).Get(configmap, apisMetaV1.GetOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -123,7 +123,7 @@ type ClusterStatus struct {
 }
 
 func (k *k8sClient) GetClusterStatus() (clusterStatus *ClusterStatus, err error) {
-	opt := api.ListOptions{Watch: false}
+	opt := apiv1.ListOptions{Watch: false}
 
 	nodes, err := k.clientset.Core().Nodes().List(opt)
 	if err != nil {
